@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit Converter & Difference Checker</title>
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1a1a1a;
+            color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            transition: all 0.3s ease;
+        }
+        .container {
+            background-color: #333;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+        h1 {
+            font-size: 28px;
+            color: #007BFF;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 20px;
+            color: #f5f5f5;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #555;
+            font-size: 16px;
+            background-color: #444;
+            color: #f5f5f5;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        input:focus, select:focus, button:hover {
+            border-color: #007BFF;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+        }
+        #differenceResult, #conversionResult {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        .same {
+            color: #28a745;
+            font-size: 22px;
+        }
+        .not-same {
+            color: #dc3545;
+            font-size: 22px;
+        }
+        /* Light Theme */
+        .light-theme body {
+            background-color: #f4f7fa;
+            color: #333;
+        }
+        .light-theme .container {
+            background-color: white;
+        }
+        .light-theme input, .light-theme select {
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+        .light-theme button {
+            background-color: #007BFF;
+        }
+        /* Toggle Switch Styling */
+        .theme-toggle-switch {
+            position: relative;
+            width: 40px;
+            height: 20px;
+            background-color: #333;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .theme-toggle-switch .toggle-thumb {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 14px;
+            height: 14px;
+            background-color: white;
+            border-radius: 50%;
+            transition: left 0.3s ease;
+        }
+        .theme-toggle-switch.light .toggle-thumb {
+            left: 23px;
+        }
+        .theme-toggle-switch .sun-icon,
+        .theme-toggle-switch .moon-icon {
+            position: absolute;
+            font-size: 14px;
+            color: white;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .sun-icon {
+            left: 5px;
+        }
+        .moon-icon {
+            right: 5px;
+        }
+        @media (max-width: 400px) {
+            .container {
+                width: 90%;
+            }
+        }
+    </style>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script> <!-- FontAwesome for icons -->
+</head>
+<body>
+
+    <div class="container fadeIn">
+        <h1>Unit Converter & Difference Checker</h1>
+
+        <!-- Theme Toggle Button -->
+        <div class="theme-toggle-switch" id="themeToggle" onclick="toggleTheme()">
+            <i class="fas fa-sun sun-icon"></i>
+            <i class="fas fa-moon moon-icon"></i>
+            <div class="toggle-thumb"></div>
+        </div>
+
+        <!-- Difference Checker -->
+        <h2 id="differenceTitle">Difference Checker</h2>
+        <input type="number" id="leftValue" placeholder="Left side value" />
+        <select id="leftUnit">
+            <option value="cm">cm</option>
+            <option value="mm">mm</option>
+            <option value="in">in</option>
+            <option value="ft">ft</option>
+            <option value="m">m</option>
+        </select>
+        <input type="number" id="rightValue" placeholder="Right side value" />
+        <select id="rightUnit">
+            <option value="cm">cm</option>
+            <option value="mm">mm</option>
+            <option value="in">in</option>
+            <option value="ft">ft</option>
+            <option value="m">m</option>
+        </select>
+        <button onclick="checkDifference()" id="calculateButton"><b>Calculate</b></button>
+        <div id="differenceResult"></div>
+        <div id="conversionResult"></div>
+    </div>
+
+    <script>
+        // Function to convert input to centimeters
+        function convertToCm(value, unit) {
+            switch (unit) {
+                case 'cm':
+                    return value;
+                case 'mm':
+                    return value / 10; // 1 cm = 10 mm
+                case 'in':
+                    return value * 2.54; // 1 inch = 2.54 cm
+                case 'ft':
+                    return value * 30.48; // 1 foot = 30.48 cm
+                case 'm':
+                    return value * 100; // 1 meter = 100 cm
+                default:
+                    return value; // fallback
+            }
+        }
+
+        // Function to check if values are within the acceptable range
+        function checkDifference() {
+            var leftValue = parseFloat(document.getElementById('leftValue').value);
+            var rightValue = parseFloat(document.getElementById('rightValue').value);
+            var leftUnit = document.getElementById('leftUnit').value;
+            var rightUnit = document.getElementById('rightUnit').value;
+            var resultDiv = document.getElementById('differenceResult');
+            var conversionResultDiv = document.getElementById('conversionResult');
+
+            if (isNaN(leftValue) || isNaN(rightValue)) {
+                resultDiv.innerHTML = "Please enter valid numbers.";
+                resultDiv.style.color = '#ff073a'; // Error color
+                return;
+            }
+
+            // Convert inputs to centimeters
+            var leftValueCm = convertToCm(leftValue, leftUnit);
+            var rightValueCm = convertToCm(rightValue, rightUnit);
+
+            // Compare values based on the conditions
+            if (leftValueCm >= 30 || rightValueCm >= 30) {
+                // ±3 cm comparison
+                if (
+                    (leftValueCm >= rightValueCm - 3 && leftValueCm <= rightValueCm + 3) ||
+                    (rightValueCm >= leftValueCm - 3 && rightValueCm <= leftValueCm + 3)
+                ) {
+                    resultDiv.innerHTML = `<span class="same">Same</span>`;
+                } else {
+                    resultDiv.innerHTML = `<span class="not-same">Not Same</span>`;
+                }
+            } else {
+                // 10% comparison for values less than 30 cm
+                var tenPercentOfLeft = leftValueCm * 0.10;
+                var lowerBound = leftValueCm - tenPercentOfLeft;
+                var upperBound = leftValueCm + tenPercentOfLeft;
+
+                // Check if right value is within the range
+                if (rightValueCm >= lowerBound && rightValueCm <= upperBound) {
+                    resultDiv.innerHTML = `<span class="same">Same</span>`;
+                } else {
+                    resultDiv.innerHTML = `<span class="not-same">Not Same</span>`;
+                }
+            }
+
+            // Show conversion results
+            conversionResultDiv.innerHTML = `
+                <div>Left Value in cm: ${leftValueCm.toFixed(2)} cm</div>
+                <div>Right Value in cm: ${rightValueCm.toFixed(2)} cm</div>
+            `;
+        }
+
+        // Function to toggle between light and dark themes
+        function toggleTheme() {
+            document.body.classList.toggle("light-theme");
+            var toggle = document.getElementById("themeToggle");
+            toggle.classList.toggle("light");
+        }
+    </script>
+</body>
+</html>
