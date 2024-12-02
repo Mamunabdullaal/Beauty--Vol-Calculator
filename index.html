@@ -40,6 +40,14 @@
       background-color: #2c2c2c;
       color: #e0e0e0;
     }
+    select {
+      padding: 8px;
+      margin: 5px;
+      border: 1px solid #555;
+      border-radius: 4px;
+      background-color: #2c2c2c;
+      color: #e0e0e0;
+    }
     button {
       padding: 10px 20px;
       margin-top: 10px;
@@ -78,7 +86,15 @@
       <label for="temu-width">Width:</label>
       <input type="number" id="temu-width" placeholder="e.g., 30"><br>
       <label for="temu-height">Height:</label>
-      <input type="number" id="temu-height" placeholder="e.g., 13">
+      <input type="number" id="temu-height" placeholder="e.g., 13"><br>
+      <label for="temu-unit">Unit:</label>
+      <select id="temu-unit">
+        <option value="cm">cm</option>
+        <option value="inches">inches</option>
+        <option value="ft">ft</option>
+        <option value="m">m</option>
+        <option value="mm">mm</option>
+      </select>
     </div>
     <div class="form-section">
       <h3><span class="other">Other (Bag Size)</span></h3>
@@ -87,12 +103,35 @@
       <label for="other-width">Width:</label>
       <input type="number" id="other-width" placeholder="e.g., 13"><br>
       <label for="other-height">Height:</label>
-      <input type="number" id="other-height" placeholder="e.g., 19">
+      <input type="number" id="other-height" placeholder="e.g., 19"><br>
+      <label for="other-unit">Unit:</label>
+      <select id="other-unit">
+        <option value="cm">cm</option>
+        <option value="inches">inches</option>
+        <option value="ft">ft</option>
+        <option value="m">m</option>
+        <option value="mm">mm</option>
+      </select>
     </div>
     <button onclick="compareSizes()">Compare</button>
     <div class="result" id="result"></div>
   </div>
+
   <script>
+    // Conversion factors to convert units to centimeters
+    const conversionFactors = {
+      inches: 2.54, // 1 inch = 2.54 cm
+      ft: 30.48, // 1 foot = 30.48 cm
+      m: 100, // 1 meter = 100 cm
+      mm: 0.1, // 1 mm = 0.1 cm
+      cm: 1 // 1 cm = 1 cm
+    };
+
+    // Function to convert the input value to centimeters
+    function convertToCm(value, unit) {
+      return value * conversionFactors[unit] || value;
+    }
+
     function calculateVolume(length, width, height) {
       length = length || 1; // Default to 1 if missing
       width = width || 1; // Default to 1 if missing
@@ -101,19 +140,30 @@
     }
 
     function compareSizes() {
-      // Temu Bag Dimensions
+      // Temu Bag Dimensions with Conversion to cm
       const temuLength = parseFloat(document.getElementById("temu-length").value) || 0;
       const temuWidth = parseFloat(document.getElementById("temu-width").value) || 0;
       const temuHeight = parseFloat(document.getElementById("temu-height").value) || 0;
+      const temuUnit = document.getElementById("temu-unit").value;
 
-      // Other Bag Dimensions
+      // Other Bag Dimensions with Conversion to cm
       const otherLength = parseFloat(document.getElementById("other-length").value) || 0;
       const otherWidth = parseFloat(document.getElementById("other-width").value) || 0;
       const otherHeight = parseFloat(document.getElementById("other-height").value) || 0;
+      const otherUnit = document.getElementById("other-unit").value;
 
-      // Calculate Volumes
-      const volume1 = calculateVolume(temuLength, temuWidth, temuHeight);
-      const volume2 = calculateVolume(otherLength, otherWidth, otherHeight);
+      // Convert all dimensions to centimeters
+      const convertedTemuLength = convertToCm(temuLength, temuUnit);
+      const convertedTemuWidth = convertToCm(temuWidth, temuUnit);
+      const convertedTemuHeight = convertToCm(temuHeight, temuUnit);
+
+      const convertedOtherLength = convertToCm(otherLength, otherUnit);
+      const convertedOtherWidth = convertToCm(otherWidth, otherUnit);
+      const convertedOtherHeight = convertToCm(otherHeight, otherUnit);
+
+      // Calculate Volumes in cm³
+      const volume1 = calculateVolume(convertedTemuLength, convertedTemuWidth, convertedTemuHeight);
+      const volume2 = calculateVolume(convertedOtherLength, convertedOtherWidth, convertedOtherHeight);
 
       // Calculate Difference Ratio based on Temu's volume
       const differenceRatio = Math.abs(volume1 - volume2) / volume1 * 100;
