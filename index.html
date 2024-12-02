@@ -115,8 +115,8 @@
       const volume1 = calculateVolume(temuLength, temuWidth, temuHeight);
       const volume2 = calculateVolume(otherLength, otherWidth, otherHeight);
 
-      // Calculate Difference Ratio
-      const differenceRatio = Math.abs(volume1 - volume2) / Math.max(volume1, volume2) * 100;
+      // Calculate Difference Ratio based on Temu's volume
+      const differenceRatio = Math.abs(volume1 - volume2) / volume1 * 100;
 
       // Display Result
       const resultDiv = document.getElementById("result");
